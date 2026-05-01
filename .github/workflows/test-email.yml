@@ -16,6 +16,7 @@ jobs:
       - name: 테스트 이메일 발송
         env:
           SMTP_KEY:     ${{ secrets.SMTP_KEY }}
+          SMTP_USER:    ${{ secrets.SMTP_USER }}
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           SENDER_NAME:  ${{ secrets.SENDER_NAME }}
           RECIPIENTS:   "lim_seong_jin@naver.com,jeon.jegyeong@gmail.com"
@@ -26,10 +27,12 @@ jobs:
           from email.mime.text import MIMEText
 
           smtp_key     = os.environ['SMTP_KEY']
+          smtp_user    = os.environ['SMTP_USER']
           sender_email = os.environ['SENDER_EMAIL']
           sender_name  = os.environ['SENDER_NAME']
           recipients   = [e.strip() for e in os.environ['RECIPIENTS'].split(',')]
           print(f'수신자: {recipients}')
+          print(f'SMTP 로그인: {smtp_user}')
 
           msg = MIMEMultipart('alternative')
           msg['Subject'] = '클로드 테스트'
@@ -39,7 +42,7 @@ jobs:
 
           with smtplib.SMTP('smtp-relay.brevo.com', 587) as server:
               server.starttls()
-              server.login(sender_email, smtp_key)
+              server.login(smtp_user, smtp_key)
               server.sendmail(sender_email, recipients, msg.as_string())
           print('발송 완료')
           EOF

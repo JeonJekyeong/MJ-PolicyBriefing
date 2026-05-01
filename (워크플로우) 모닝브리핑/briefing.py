@@ -10,6 +10,7 @@ from datetime import datetime, timezone, timedelta
 
 # ─── 설정 ───────────────────────────────────────────────────────
 SMTP_KEY     = os.environ['SMTP_KEY']
+SMTP_USER    = os.environ['SMTP_USER']
 SENDER_EMAIL = os.environ['SENDER_EMAIL']
 SENDER_NAME  = os.environ['SENDER_NAME']
 
@@ -218,7 +219,7 @@ def send_email(recipients, subject, html):
 
     with smtplib.SMTP('smtp-relay.brevo.com', 587) as server:
         server.starttls()
-        server.login(SENDER_EMAIL, SMTP_KEY)
+        server.login(SMTP_USER, SMTP_KEY)
         server.sendmail(SENDER_EMAIL, [r['email'] for r in recipients], msg.as_string())
     return 200, {'message': 'sent'}
 
