@@ -2,7 +2,7 @@ name: 정책 브리핑 자동 발송
 
 on:
   schedule:
-    - cron: '0 22 * * *'  # 매일 07:00 KST (UTC 22:00)
+    - cron: '0 22 * * 1-5'  # 평일 07:00 KST (UTC 22:00, 월~금)
   workflow_dispatch:       # 대시보드에서 수동 실행 가능
 
 jobs:

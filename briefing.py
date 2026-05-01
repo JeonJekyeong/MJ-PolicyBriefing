@@ -1,6 +1,7 @@
 import os
 import re
 import requests
+import holidays
 from bs4 import BeautifulSoup
 from datetime import datetime, timezone, timedelta
 
@@ -9,8 +10,20 @@ BREVO_API_KEY = os.environ['BREVO_API_KEY']
 SENDER_EMAIL  = os.environ['SENDER_EMAIL']
 SENDER_NAME   = os.environ['SENDER_NAME']
 
-KST   = timezone(timedelta(hours=9))
-TODAY = datetime.now(KST).strftime('%Y년 %m월 %d일')
+KST        = timezone(timedelta(hours=9))
+TODAY_DT   = datetime.now(KST)
+TODAY      = TODAY_DT.strftime('%Y년 %m월 %d일')
+TODAY_DATE = TODAY_DT.date()
+
+# ─── 평일·공휴일 체크 ───────────────────────────────────────────
+def is_send_day():
+    if TODAY_DATE.weekday() >= 5:                          # 토(5)·일(6)
+        return False, '주말'
+    kr = holidays.KoreaHolidayCalendar() if hasattr(holidays, 'KoreaHolidayCalendar') \
+         else holidays.country_holidays('KR', years=TODAY_DATE.year)
+    if TODAY_DATE in kr:
+        return False, f'공휴일 ({kr[TODAY_DATE]})'
+    return True, '평일'
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -225,6 +238,10 @@ def send_email(recipients, subject, html):
 # ─── 메인 ────────────────────────────────────────────────────────
 
 def main():
+    send, reason = is_send_day()
+    if not send:
+        print(f'[{TODAY}] 발송 건너뜀 — {reason}')
+        return
     print(f'[{TODAY}] 정책 브리핑 수집 시작')
 
     sites = [
