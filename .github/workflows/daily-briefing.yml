@@ -1,0 +1,29 @@
+name: 정책 브리핑 자동 발송
+
+on:
+  schedule:
+    - cron: '0 22 * * *'  # 매일 07:00 KST (UTC 22:00)
+  workflow_dispatch:       # 대시보드에서 수동 실행 가능
+
+jobs:
+  send-briefing:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 3.11 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: 정책 브리핑 실행
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          SENDER_EMAIL:  ${{ secrets.SENDER_EMAIL }}
+          SENDER_NAME:   ${{ secrets.SENDER_NAME }}
+        run: python briefing.py

@@ -1,0 +1,6 @@
+정책*.txt
+*.pdf
+*.hwp
+__pycache__/
+*.pyc
+.env
